@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Infinite scroll</title>
+</head>
+<body>
+<style type="text/css">
+    .item {
+        height: 200px;
+        text-align: center;
+        font-size: 150px;
+        padding: 5px;
+        margin: 5px;
+        background: bisque;
+    }
+    .ivl-item-collapsed {
+        display: none;
+    }
+</style>
+<div style="height: 800px; width: 100%; background: gainsboro;"></div>
+<div class="list-container">
+</div>
+<div style="height: 800px; width: 100%; background: beige;"></div>
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+<script src="infinit-virtual-list.js"></script>
+<script language="JavaScript">
+
+    function newGuid() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+            function (c) {
+                var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+    }
+
+    $(function () {
+        let items = [];
+        for (let i = 0; i < 20; i++) {
+            items.push(i);
+        }
+
+        let list = new InfiniteVirtualList({
+                maxItemsNumber: items.length,
+                generateItemHtml: function (i) {
+                    return `<div class='item ivl-item ivl-item-collapsed' style='' data-item-i='${i}'>${i}</div>`;
+                }
+            },
+            $(".list-container"), $(document));
+
+        list.attach();
+        list.populate(items);
+    });
+</script>
+</html>
