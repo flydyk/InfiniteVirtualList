@@ -37,22 +37,6 @@ function InfiniteVirtualList(settings, $container, $scrollKeeper) {
         return elem.scrollingElement || elem;
     };
 
-    list.isScrolledToBottom = function (scrollableElem) {
-        return scrollableElem.scrollHeight - scrollableElem.scrollTop === scrollableElem.clientHeight;
-    };
-
-    list.isScrolledToTop = function (scrollableElem) {
-        return scrollableElem.scrollTop === 0;
-    };
-
-    list.scrollToElem = function (scrollableElem, element, offset) {
-        return scrollableElem.scrollTop = element.offsetTop - offset;
-    };
-
-    list.scrollToOffset = function (scrollableElem, offset) {
-        return scrollableElem.scrollTop = offset;
-    };
-
     list._getViewportCenter = function () {
         return list.center || (list.center = Math.floor(list._getScrollingElem(list.$scrollKeeper[0]).clientHeight / 2));
     };
@@ -184,24 +168,6 @@ function InfiniteVirtualList(settings, $container, $scrollKeeper) {
         return itemsHtml;
     };
 
-    list.populate = function (items) {
-        let height = list._calcSpaceHolderHeight(list.spaceHolderType.top);
-        let spaceHolder = "<div data-spaceholder-type='top' style='width:100%; height:" + height + "px'></div>";
-
-        list.$container.append(spaceHolder);
-
-        let itemsHtml = list._renderAllItems(items);
-
-        list.$container.append(itemsHtml);
-
-        height = list._calcSpaceHolderHeight(list.spaceHolderType.bottom);
-        spaceHolder = "<div data-spaceholder-type='bottom' style='width:100%; height:" + height + "px'></div>";
-
-        list.$container.append(spaceHolder);
-
-        list._updateVisibleItems();
-    };
-
     list._detachScrollHandlers = function () {
         list.$container.off(list.eventNamespace);
         list.$container.data(list.hasScrollHandlersMarker, false);
@@ -211,18 +177,45 @@ function InfiniteVirtualList(settings, $container, $scrollKeeper) {
         $("." + list.cssClasses.Item, list.$container).removeClass(list.cssClasses.ItemCollapsed);
         $("[data-spaceholder-type]", list.$container).remove();
     };
-
-    list.onHeightChanged = function () {
-        list.center = 0;
-    };
-
-    list.attach = function () {
-        if (list.attached)
-            return;
-
-        list._attachScrollHandlers();
-    };
 }
+
+InfiniteVirtualList.prototype.isScrolledToBottom = scrollableElem => {
+    return scrollableElem.scrollHeight - scrollableElem.scrollTop === scrollableElem.clientHeight;
+};
+
+InfiniteVirtualList.prototype.isScrolledToTop = scrollableElem => {
+    return scrollableElem.scrollTop === 0;
+};
+
+InfiniteVirtualList.prototype.scrollToElem = (scrollableElem, element, offset) => {
+    return scrollableElem.scrollTop = element.offsetTop - offset;
+};
+
+InfiniteVirtualList.prototype.scrollToOffset = (scrollableElem, offset) => {
+    return scrollableElem.scrollTop = offset;
+};
+
+InfiniteVirtualList.prototype.populate = function (items) {
+    let height = this._calcSpaceHolderHeight(this.spaceHolderType.top);
+    let spaceHolder = "<div data-spaceholder-type='top' style='width:100%; height:" + height + "px'></div>";
+
+    this.$container.append(spaceHolder);
+
+    let itemsHtml = this._renderAllItems(items);
+
+    this.$container.append(itemsHtml);
+
+    height = this._calcSpaceHolderHeight(this.spaceHolderType.bottom);
+    spaceHolder = "<div data-spaceholder-type='bottom' style='width:100%; height:" + height + "px'></div>";
+
+    this.$container.append(spaceHolder);
+
+    this._updateVisibleItems();
+};
+
+InfiniteVirtualList.prototype.onHeightChanged = function () {
+    this.center = 0;
+};
 
 InfiniteVirtualList.prototype.attach = function () {
     if (this.attached)
@@ -231,7 +224,7 @@ InfiniteVirtualList.prototype.attach = function () {
     this._attachScrollHandlers();
 };
 
-InfiniteVirtualList.prototype.detach = () => {
+InfiniteVirtualList.prototype.detach = function () {
     if (!this.attached)
         return;// clear element and detach events
 
